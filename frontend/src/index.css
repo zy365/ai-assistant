@@ -1,0 +1,43 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;600;700;800&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #020810;
+  --bg2:       #060f1e;
+  --bg3:       #0a1628;
+  --panel:     #0d1f3c;
+  --border:    #1a3a5c;
+  --border2:   #0f2a45;
+  --accent:    #00d4ff;
+  --accent2:   #0066ff;
+  --accent3:   #00ff88;
+  --text:      #c8dff0;
+  --text2:     #6a9ab8;
+  --text3:     #2a5a7a;
+  --danger:    #ff3b5c;
+  --warn:      #ffaa00;
+  --glow:      rgba(0,212,255,0.15);
+  --glow2:     rgba(0,102,255,0.1);
+}
+
+html, body, #root { height: 100%; overflow: hidden; }
+body {
+  font-family: 'Syne', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
+
+/* scrollbar */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: var(--bg2); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: var(--accent2); }
+
+@keyframes blink    { 0%,100%{opacity:1} 50%{opacity:0} }
+@keyframes pulse    { 0%,100%{opacity:0.6} 50%{opacity:1} }
+@keyframes scanline { 0%{transform:translateY(-100%)} 100%{transform:translateY(100vh)} }
+@keyframes fadeUp   { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+@keyframes glowPulse{ 0%,100%{box-shadow:0 0 8px var(--glow)} 50%{box-shadow:0 0 24px var(--glow), 0 0 48px var(--glow2)} }
+@keyframes spin     { to{transform:rotate(360deg)} }
+@keyframes dash     { to{stroke-dashoffset:0} }

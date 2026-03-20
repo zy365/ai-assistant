@@ -1,0 +1,77 @@
+name: Build & Deploy
+
+on:
+  push:
+    branches: [main]
+
+env:
+  ACR_REGISTRY: registry.cn-hangzhou.aliyuncs.com
+  ACR_NAMESPACE: your-namespace
+  IMAGE_NAME: ai-assistant-backend
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install -r backend/requirements.txt
+      - run: python -m pytest backend/tests/ -v || true
+
+  build-push:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 登录阿里云 ACR
+        run: echo "${{ secrets.ACR_PASSWORD }}" | docker login $ACR_REGISTRY -u "${{ secrets.ACR_USERNAME }}" --password-stdin
+
+      - name: 构建并推送镜像
+        run: |
+          IMAGE=$ACR_REGISTRY/$ACR_NAMESPACE/$IMAGE_NAME:${{ github.sha }}
+          docker build -t $IMAGE ./backend
+          docker push $IMAGE
+          echo "IMAGE=$IMAGE" >> $GITHUB_ENV
+
+  deploy:
+    needs: build-push
+    runs-on: ubuntu-latest
+    steps:
+      - name: 滚动部署到 ECS-1
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.ECS1_HOST }}
+          username: ${{ secrets.ECS_USER }}
+          key: ${{ secrets.ECS_SSH_KEY }}
+          script: |
+            docker pull ${{ env.IMAGE }}
+            docker stop ai-assistant || true
+            docker rm ai-assistant || true
+            docker run -d --name ai-assistant \
+              --env-file /etc/ai-assistant/.env \
+              -p 8000:8000 \
+              --restart unless-stopped \
+              ${{ env.IMAGE }}
+            sleep 10
+            curl -f http://localhost:8000/health || exit 1
+
+      - name: 滚动部署到 ECS-2
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.ECS2_HOST }}
+          username: ${{ secrets.ECS_USER }}
+          key: ${{ secrets.ECS_SSH_KEY }}
+          script: |
+            docker pull ${{ env.IMAGE }}
+            docker stop ai-assistant || true
+            docker rm ai-assistant || true
+            docker run -d --name ai-assistant \
+              --env-file /etc/ai-assistant/.env \
+              -p 8000:8000 \
+              --restart unless-stopped \
+              ${{ env.IMAGE }}
+            sleep 10
+            curl -f http://localhost:8000/health || exit 1
