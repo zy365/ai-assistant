@@ -27,12 +27,13 @@ _DEV_USER = {
         {"resource": "ai_assistant", "action": "access"},
         {"resource": "ai_tool:search_customer", "action": "execute"},
         {"resource": "ai_tool:get_customer_basic", "action": "execute"},
-        {"resource": "ai_tool:get_serve_interact", "action": "execute"},
+        {"resource": "ai_tool:get_serve_bubbling", "action": "execute"},
         {"resource": "ai_tool:get_serve_browse", "action": "execute"},
         {"resource": "ai_tool:get_position", "action": "execute"},
         {"resource": "ai_tool:get_sue", "action": "execute"},
         {"resource": "ai_tool:get_warning", "action": "execute"},
         {"resource": "ai_tool:get_customer_flow", "action": "execute"},
+        {"resource": "ai_tool:get_serve_interact", "action": "execute"},
     ],
 }
 
